@@ -3,7 +3,7 @@
  * simulating separate engine processes: no shared in-process mutex, so only the
  * database's row locks stand between them and a double spend.
  */
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";

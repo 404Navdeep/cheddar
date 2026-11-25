@@ -1,0 +1,3 @@
+[test]
+# PGlite migrates a fresh database before every test. Cold runs sit past Bun's 5s default.
+timeout = 20000

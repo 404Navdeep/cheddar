@@ -89,4 +89,4 @@ All announcements are logged in the audit trail.
 
 ## 7. Vercel
 
-Add `SLACK_BOT_TOKEN` to your Vercel project environment variables. The build command already runs migrations (`pnpm db:migrate && next build`), so no build changes are needed.
+Add `SLACK_BOT_TOKEN` to your Vercel project environment variables. The build command already runs migrations (`bun run db:migrate && bun run build`), so no build changes are needed.

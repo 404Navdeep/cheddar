@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import type { PGlite } from "@electric-sql/pglite";
 import { createPgliteDb, eq, orders, proposals, sql, wedges, wheels, type AnyDb } from "@cheddar/db";
 import {
@@ -184,7 +184,7 @@ describe("Ripening", () => {
     const s = await proposeSettlement(db, { wheelId: wheel.id, proposerId: creator.id, outcome: "all_no", evidence: "x" });
     await approveSettlement(db, { settlementId: s.id, reviewerId: monger.id });
     await expect(
-      db.execute(sql`INSERT INTO journal_entries (kind, idempotency_key) VALUES ('payout', ${`payout:${w!.id}`})`),
+      Promise.resolve(db.execute(sql`INSERT INTO journal_entries (kind, idempotency_key) VALUES ('payout', ${`payout:${w!.id}`})`)),
     ).rejects.toThrow();
   });
 });

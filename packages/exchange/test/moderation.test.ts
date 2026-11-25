@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import type { PGlite } from "@electric-sql/pglite";
 import { asc, auditLog, categories, wheels, createPgliteDb, eq, sql, users, type AnyDb } from "@cheddar/db";
 import {
@@ -208,7 +208,7 @@ describe("Audit log", () => {
     expect(await code(approveProposal(db, { proposalId: p.id, reviewerId: alice.id }))).toBe("FORBIDDEN");
     expect((await logs()).map((x) => x.action)).toEqual(["proposal.submit"]);
     for (const q of [sql`UPDATE audit_log SET action = 'x'`, sql`DELETE FROM audit_log`, sql`TRUNCATE audit_log`]) {
-      await expect(db.execute(q)).rejects.toThrow();
+      await expect(Promise.resolve(db.execute(q))).rejects.toThrow();
     }
     expect(await logs()).toHaveLength(1);
     void monger;
