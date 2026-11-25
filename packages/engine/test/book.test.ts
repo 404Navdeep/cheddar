@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 import { OrderBook, type OrderInput } from "../src/index";
 
 let n = 0;

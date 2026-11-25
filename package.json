@@ -2,17 +2,26 @@
   "name": "cheddar",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@12.18.0",
+  "packageManager": "bun@1.4.5",
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "test": "pnpm -r test",
-    "dev": "pnpm --filter @cheddar/web dev",
-    "build": "pnpm --filter @cheddar/web build",
-    "seed:demo": "tsx scripts/seed-demo.ts",
-    "db:migrate": "tsx scripts/migrate.ts"
+    "test": "bun test",
+    "dev": "bun run --filter @cheddar/web dev",
+    "build": "bun run --filter @cheddar/web build",
+    "seed:demo": "bun scripts/seed-demo.ts",
+    "db:migrate": "bun scripts/migrate.ts"
   },
+  "trustedDependencies": [
+    "esbuild",
+    "sharp",
+    "embedded-postgres",
+    "@embedded-postgres/darwin-arm64",
+    "@embedded-postgres/linux-x64",
+    "@embedded-postgres/windows-x64"
+  ],
   "devDependencies": {
     "@cheddar/db": "workspace:*",
     "@cheddar/exchange": "workspace:*",
-    "tsx": "^4.23.15"
+    "@types/bun": "^1.4.5"
   }
 }

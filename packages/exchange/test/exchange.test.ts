@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { eq } from "@cheddar/db";
 import type { PGlite } from "@electric-sql/pglite";
 import { createPgliteDb, mouseFunders, orders, type AnyDb } from "@cheddar/db";

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { eq, sql } from "drizzle-orm";
 import type { PGlite } from "@electric-sql/pglite";
 import {
@@ -63,6 +63,11 @@ async function pgError(p: Promise<unknown>): Promise<string> {
   throw new Error("expected the query to fail");
 }
 
+/** Drizzle builders are thenables. `expect().rejects` only accepts a real Promise. */
+function query<T>(p: PromiseLike<T>): Promise<T> {
+  return Promise.resolve(p);
+}
+
 async function balanceOf(accountId: string) {
   const [a] = await db.select().from(accounts).where(eq(accounts.id, accountId));
   return a!.balance;
@@ -72,7 +77,7 @@ describe("schema", () => {
   it("migrates and seeds exactly one churn issuance account", async () => {
     const rows = await db.select().from(accounts).where(eq(accounts.kind, "churn_issuance"));
     expect(rows).toHaveLength(1);
-    await expect(db.insert(accounts).values({ kind: "churn_issuance" })).rejects.toThrow();
+    await expect(query(db.insert(accounts).values({ kind: "churn_issuance" }))).rejects.toThrow();
   });
 
   it("a balanced churn credit updates the balance cache to match the lines", async () => {
@@ -170,29 +175,29 @@ describe("schema", () => {
     const [wedge] = await db.insert(wedges).values({ wheelId: wheel!.id, label: "Yes" }).returning();
 
     const base = { userId: user.id, wedgeId: wedge!.id, outcome: "YES" as const, side: "BUY" as const, qty: 1, remaining: 1 };
-    await expect(db.insert(orders).values({ ...base, price: 0 })).rejects.toThrow();
-    await expect(db.insert(orders).values({ ...base, price: 100 })).rejects.toThrow();
-    await expect(db.insert(orders).values({ ...base, price: 50, remaining: 2 })).rejects.toThrow();
-    await expect(db.insert(orders).values({ ...base, price: 50, lockedShares: 1 })).rejects.toThrow();
+    await expect(query(db.insert(orders).values({ ...base, price: 0 }))).rejects.toThrow();
+    await expect(query(db.insert(orders).values({ ...base, price: 100 }))).rejects.toThrow();
+    await expect(query(db.insert(orders).values({ ...base, price: 50, remaining: 2 }))).rejects.toThrow();
+    await expect(query(db.insert(orders).values({ ...base, price: 50, lockedShares: 1 }))).rejects.toThrow();
     await db.insert(orders).values({ ...base, price: 50, lockedTicks: 50 });
 
     await expect(
-      db.insert(positions).values({ userId: user.id, wedgeId: wedge!.id, yesShares: 1, yesLocked: 2 }),
+      query(db.insert(positions).values({ userId: user.id, wedgeId: wedge!.id, yesShares: 1, yesLocked: 2 })),
     ).rejects.toThrow();
 
     await expect(
-      db.insert(settlements).values({ wheelId: wheel!.id, proposerId: user.id, outcome: "wedge_wins", evidence: "trust me" }),
+      query(db.insert(settlements).values({ wheelId: wheel!.id, proposerId: user.id, outcome: "wedge_wins", evidence: "trust me" })),
     ).rejects.toThrow();
     await db
       .insert(settlements)
       .values({ wheelId: wheel!.id, proposerId: user.id, outcome: "wedge_wins", winningWedgeId: wedge!.id, evidence: "link" });
     await expect(
-      db.insert(settlements).values({ wheelId: wheel!.id, proposerId: user.id, outcome: "moldy", evidence: "dupe pending" }),
+      query(db.insert(settlements).values({ wheelId: wheel!.id, proposerId: user.id, outcome: "moldy", evidence: "dupe pending" })),
     ).rejects.toThrow();
   });
 
   it("humans need an HCA subject, bots do not", async () => {
-    await expect(db.insert(users).values({ name: "nobody" })).rejects.toThrow();
+    await expect(query(db.insert(users).values({ name: "nobody" }))).rejects.toThrow();
     await db.insert(users).values({ name: "The Mouse", isBot: true });
   });
 });

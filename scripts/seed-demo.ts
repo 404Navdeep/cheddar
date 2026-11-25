@@ -2,8 +2,8 @@
  * Demo data for the LOCAL PGlite database (.data/pglite), so the UI has something to show.
  * Refuses to run against DATABASE_URL. Stop the dev server first (PGlite allows one process).
  *
- *   pnpm seed:demo             first run: demo users + wheels
- *   pnpm seed:demo --refresh   retire old demo wheels (Moldy, only if no real user is in them)
+ *   bun run seed:demo             first run: demo users + wheels
+ *   bun run seed:demo --refresh   retire old demo wheels (Moldy, only if no real user is in them)
  *                              and create a fresh set with two weeks of realistic history
  *
  * Everything goes through the real exchange, so the ledger audit stays clean.

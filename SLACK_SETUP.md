@@ -89,6 +89,7 @@ All announcements are logged in the audit trail.
 
 ## 7. Vercel
 
+<<<<<<< HEAD
 Add `SLACK_BOT_TOKEN` to your Vercel project environment variables. The build command already runs migrations (`pnpm db:migrate && next build`), so no build changes are needed.
 
 ## 8. Channel auto-sync
@@ -105,3 +106,6 @@ It is called by `.github/workflows/cron.yml`, so it needs:
 The bot must be a member of the channel (it auto-joins public channels on the first run).
 The response includes `invited`, `alreadyIn`, `newlyLeft`, `skippedLeft`, `rejoined` and
 `failed`, and a failed run returns `500` so the workflow goes red instead of silently passing.
+=======
+Add `SLACK_BOT_TOKEN` to your Vercel project environment variables. The build command already runs migrations (`bun run db:migrate && bun run build`), so no build changes are needed.
+>>>>>>> bf3d853eec6d8c9b38235cea318a4f21c217981d
