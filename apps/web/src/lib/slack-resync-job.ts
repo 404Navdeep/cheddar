@@ -73,26 +73,43 @@ async function slackPost<T>(
 
 /** Every member of the channel, following pagination. */
 async function listChannelMembers(token: string, channel: string): Promise<Set<string>> {
-  const members = new Set<string>();
-  let cursor: string | undefined;
-  do {
-    const params = new URLSearchParams({ channel, limit: "200" });
-    if (cursor) params.set("cursor", cursor);
-    const res = await fetch(`${SLACK_API}/conversations.members?${params}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const json = (await res.json()) as SlackResponse<{
-      members?: string[];
-      response_metadata?: { next_cursor?: string };
-    }>;
-    if (!json.ok) {
-      const hint = json.needed ? ` (needs scope ${json.needed})` : "";
-      throw new Error(`conversations.members failed: ${json.error ?? "unknown"}${hint}`);
+  const fetchAll = async (): Promise<Set<string>> => {
+    const members = new Set<string>();
+    let cursor: string | undefined;
+    do {
+      const params = new URLSearchParams({ channel, limit: "200" });
+      if (cursor) params.set("cursor", cursor);
+      const res = await fetch(`${SLACK_API}/conversations.members?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = (await res.json()) as SlackResponse<{
+        members?: string[];
+        response_metadata?: { next_cursor?: string };
+      }>;
+      if (!json.ok) {
+        const hint = json.needed ? ` (needs scope ${json.needed})` : "";
+        throw new Error(`conversations.members failed: ${json.error ?? "unknown"}${hint}`);
+      }
+      for (const m of json.members ?? []) members.add(m);
+      cursor = json.response_metadata?.next_cursor || undefined;
+    } while (cursor);
+    return members;
+  };
+
+  try {
+    return await fetchAll();
+  } catch (e) {
+    // A bot that isn't in a public channel can't list its members. Join once and retry.
+    if (!(e instanceof Error) || !e.message.includes("not_in_channel")) throw e;
+    const join = await slackPost<{}>("conversations.join", token, { channel });
+    if (!join.ok) {
+      throw new Error(
+        `The Slack bot is not in ${channel} and could not join it (${join.error ?? "unknown"}). ` +
+          `Add the bot to the channel, then re-run.`,
+      );
     }
-    for (const m of json.members ?? []) members.add(m);
-    cursor = json.response_metadata?.next_cursor || undefined;
-  } while (cursor);
-  return members;
+    return fetchAll();
+  }
 }
 
 /** Active, human users who have a Slack id on file. */

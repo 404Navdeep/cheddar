@@ -15,11 +15,8 @@ jobs:
         env:
           APP_URL: ${{ secrets.APP_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
-        run: |
-          url="$(printf '%s' "$APP_URL" | tr -d '[:space:]')"; url="${url%/}"
-          case "$url" in http://*|https://*) ;; *) url="https://$url" ;; esac
-          secret="$(printf '%s' "$CRON_SECRET" | tr -d '\r\n')"
-          curl -fsS -H "Authorization: Bearer $secret" "$url/api/cron/mouse"
+          JOB_PATH: /api/cron/mouse
+        run: bash .github/scripts/cron-call.sh
   churn:
     if: github.event.schedule != '*/5 * * * *'
     runs-on: ubuntu-latest
@@ -28,11 +25,8 @@ jobs:
         env:
           APP_URL: ${{ secrets.APP_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
-        run: |
-          url="$(printf '%s' "$APP_URL" | tr -d '[:space:]')"; url="${url%/}"
-          case "$url" in http://*|https://*) ;; *) url="https://$url" ;; esac
-          secret="$(printf '%s' "$CRON_SECRET" | tr -d '\r\n')"
-          curl -fsS -H "Authorization: Bearer $secret" "$url/api/cron/churn"
+          JOB_PATH: /api/cron/churn
+        run: bash .github/scripts/cron-call.sh
   slack-resync:
     if: github.event.schedule != '*/5 * * * *'
     runs-on: ubuntu-latest
@@ -41,8 +35,5 @@ jobs:
         env:
           APP_URL: ${{ secrets.APP_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
-        run: |
-          url="$(printf '%s' "$APP_URL" | tr -d '[:space:]')"; url="${url%/}"
-          case "$url" in http://*|https://*) ;; *) url="https://$url" ;; esac
-          secret="$(printf '%s' "$CRON_SECRET" | tr -d '\r\n')"
-          curl -fsS -H "Authorization: Bearer $secret" "$url/api/cron/slack-resync"
+          JOB_PATH: /api/cron/slack-resync
+        run: bash .github/scripts/cron-call.sh
