@@ -19,7 +19,12 @@
         "chat:write",
         "im:write",
         "im:read",
-        "users:read"
+        "users:read",
+        "channels:read",
+        "channels:manage",
+        "channels:join",
+        "groups:read",
+        "groups:write"
       ]
     }
   },

@@ -90,3 +90,18 @@ All announcements are logged in the audit trail.
 ## 7. Vercel
 
 Add `SLACK_BOT_TOKEN` to your Vercel project environment variables. The build command already runs migrations (`pnpm db:migrate && next build`), so no build changes are needed.
+
+## 8. Channel auto-sync
+
+`GET /api/cron/slack-resync` invites every active (non-bot, non-suspended) user with a
+Slack ID on file to the channel, and remembers who left so they are never re-added.
+It is called by `.github/workflows/cron.yml`, so it needs:
+
+- `SLACK_BOT_TOKEN` — bot token with `channels:read`, `channels:manage`, `channels:join`
+  (and `groups:read`/`groups:write` if the channel is private).
+- `SLACK_SYNC_CHANNEL_ID` — optional, defaults to `C0CH8NW4UNP`.
+- `CRON_SECRET` — the endpoint returns `401` without `Authorization: Bearer $CRON_SECRET`.
+
+The bot must be a member of the channel (it auto-joins public channels on the first run).
+The response includes `invited`, `alreadyIn`, `newlyLeft`, `skippedLeft`, `rejoined` and
+`failed`, and a failed run returns `500` so the workflow goes red instead of silently passing.

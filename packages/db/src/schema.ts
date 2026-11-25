@@ -676,6 +676,27 @@ export const rateEvents = pgTable(
   (t) => [index("rate_events_user_key_idx").on(t.userId, t.key, t.at)],
 );
 
+// ---------- Slack channel sync ----------
+
+/**
+ * People the auto-sync job has invited to the Cheddar Slack channel.
+ * Presence here is also how the job notices someone later left the channel.
+ */
+export const slackChannelMembers = pgTable("slack_channel_members", {
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  addedAt: ts("added_at").notNull().defaultNow(),
+});
+
+/** People who were in the channel and left. The sync never re-adds them. */
+export const slackChannelLeft = pgTable("slack_channel_left", {
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  leftAt: ts("left_at").notNull().defaultNow(),
+});
+
 // ---------- churn (Hackatime -> Latta) ----------
 
 export const churnSyncs = pgTable(

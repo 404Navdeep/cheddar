@@ -22,6 +22,10 @@ export const env = {
   /** 32 random bytes, base64. Encrypts OAuth tokens and OAuth state cookies. */
   tokenKey: process.env.TOKEN_ENCRYPTION_KEY ?? "",
   cronSecret: process.env.CRON_SECRET ?? "",
+  /** Bot token used for Slack DMs and the channel resync. */
+  slackBotToken: process.env.SLACK_BOT_TOKEN ?? "",
+  /** Channel every active user is invited to by /api/cron/slack-resync. */
+  slackSyncChannelId: process.env.SLACK_SYNC_CHANNEL_ID || "C0CH8NW4UNP",
   /** Slack ids that are made Cheesemongers when they log in. */
   cheesemongerSlackIds: list(process.env.CHEDDAR_CHEESEMONGER_SLACK_IDS),
   /** Slack ids that are made super admins (and Cheesemongers) when they log in. */
